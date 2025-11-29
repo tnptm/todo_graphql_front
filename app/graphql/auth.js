@@ -1,39 +1,31 @@
-/*
-GraphQL authentication queries: LOGIN_MUTATION, ME_QUERY, REGISTER_MUTATION
+import { gql } from "@apollo/client";
 
-*/
-export const LOGIN_MUTATION = `
-mutation Login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    token
-    user {
-      id
-      email
-      name
+export const LOGIN_MUTATION = gql`
+  mutation Login($username: String!, $password: String!) {
+    tokenAuth(username: $username, password: $password) {
+      token
     }
   }
-}
 `;
 
-export const ME_QUERY = `
-query Me {
-  me {
-    id
-    email
-    name
-  }
-}
-`;
-
-export const REGISTER_MUTATION = `
-mutation Register($email: String!, $password: String!, $name: String!) {
-  register(email: $email, password: $password, name: $name) {
-    token
-    user {
+export const ME_QUERY = gql`
+  query Me {
+    me {
       id
       email
-      name
+      username
     }
   }
-}
+`;
+
+export const REGISTER_MUTATION = gql`
+  mutation Register($username: String!, $email: String!, $password: String!) {
+    createUser(username: $username, email: $email, password: $password) {
+      user {
+        id
+        email
+        username
+      }
+    }
+  }
 `;

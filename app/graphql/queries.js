@@ -7,6 +7,9 @@ export const GET_TODOS = gql`
       text
       completed
       createdAt
+      owner {
+        username
+      }
     }
   }
 `;

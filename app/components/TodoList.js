@@ -86,6 +86,10 @@ export default function TodoList() {
                 Delete
               </button>
             </label>
+            <div style={{ fontSize: "0.8rem", color: "#666", marginTop: 4 }}>
+              Created at {new Date(t.createdAt).toLocaleString()}
+              , Owner: {t.owner.username}
+            </div>
           </li>
         ))}
       </ul>

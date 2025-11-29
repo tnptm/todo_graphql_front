@@ -1,21 +1,24 @@
-import { ApolloClient } from "@apollo/client";
-import { InMemoryCache } from "@apollo/client/cache";
-import { HttpLink } from "@apollo/client/link/http";
-/*
-import {
-  //ApolloClient,
-  InMemoryCache,
-  HttpLink,
-} from "@apollo/client/link/http";
-*/
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 
-const httpLink = new HttpLink({
+const httpLink = createHttpLink({
   uri: "http://localhost:8000/graphql/",
-  credentials: "omit",
+});
+
+const authLink = setContext((_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `JWT ${token}` : "",
+    },
+  };
 });
 
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 

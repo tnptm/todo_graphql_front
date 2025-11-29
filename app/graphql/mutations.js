@@ -8,6 +8,10 @@ export const CREATE_TODO = gql`
         text
         completed
         createdAt
+        owner {
+          id
+          username
+        }
       }
     }
   }

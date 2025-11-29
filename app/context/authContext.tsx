@@ -8,7 +8,9 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import apolloClient from "../apollo";
-import { LOGIN_MUTATION, ME_QUERY } from "../graphql/auth";
+import { LOGIN_MUTATION, ME_QUERY, REGISTER_MUTATION } from "../graphql/auth";
+
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
 type User = Record<string, any> | null;
 type AuthContextShape = {
@@ -18,6 +20,11 @@ type AuthContextShape = {
   isAuthenticated: boolean;
   login: (
     username: string,
+    password: string,
+  ) => Promise<{ success: boolean; error?: any }>;
+  registerUser: (
+    username: string,
+    email: string,
     password: string,
   ) => Promise<{ success: boolean; error?: any }>;
   logout: () => Promise<void>;
@@ -49,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // try multiple common shapes
       const token =
+        response?.data?.tokenAuth?.token ||
         response?.data?.login?.token ||
         response?.data?.authenticate?.token ||
         response?.data?.token ||
@@ -72,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const meRes = await apolloClient.query({
         query: ME_QUERY,
         fetchPolicy: "network-only",
-        context: { headers: { authorization: `Bearer ${token}` } },
+        context: { headers: { authorization: `JWT ${token}` } },
       });
 
       const currentUser = meRes?.data?.me || meRes?.data?.currentUser || null;
@@ -96,9 +104,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // clear client store to avoid leaking cached data
       await apolloClient.clearStore();
     } catch (e) {
-      // ignore
+      // ignore clear errors
     }
   }, []);
+
+
+  const registerUser = useCallback(async (username: string, email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // 1. Register the user
+      await apolloClient.mutate({
+        mutation: REGISTER_MUTATION,
+        variables: { username, email, password },
+      });
+
+      // 2. If successful, log them in to get the token
+      const loginResult = await login(username, password);
+      if (!loginResult.success) {
+        throw loginResult.error || new Error("Registration successful but login failed.");
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      setError(err);
+      setUser(null);
+      setStoredToken(null);
+      setLoading(false);
+      return { success: false, error: err };
+    }
+  }, [login]);
+
 
   const validateSession = useCallback(async () => {
     const token =
@@ -114,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await apolloClient.query({
         query: ME_QUERY,
         fetchPolicy: "network-only",
-        context: { headers: { authorization: `Bearer ${token}` } },
+        context: { headers: { authorization: `JWT ${token}` } },
       });
       const currentUser = res?.data?.me || res?.data?.currentUser || null;
       setUser(currentUser);
@@ -141,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!user,
     login,
     logout,
+    registerUser,
     validateSession,
   };
 

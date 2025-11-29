@@ -1,22 +1,24 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/authContext";
 
-const Login = () => {
+export default function RegisterUser() {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  const { registerUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { success, error } = await login(username, password);
+    const { success, error } = await registerUser(username, email, password);
     if (success) {
-      router.push("/todo");
+      router.push("/login");
     } else {
-      console.error("Login failed:", error);
-      alert("Login failed");
+      console.error("Registration failed:", error);
+      alert("Registration failed");
     }
   };
 
@@ -34,6 +36,15 @@ const Login = () => {
         </div>
         <div className="mb-4">
           <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border border-gray-300 rounded-lg px-4 py-2 w-full"
+          />
+        </div>
+        <div className="mb-4">
+          <input
             type="password"
             placeholder="Password"
             value={password}
@@ -41,21 +52,15 @@ const Login = () => {
             className="border border-gray-300 rounded-lg px-4 py-2 w-full"
           />
         </div>
-        <div className="mb-4">
-          <p>Register new account <a href="/register" className="text-blue-500 hover:underline">here</a></p>
-          <p>Forgot password? <a href="/forgot-password" className="text-blue-500 hover:underline">Reset here</a></p>
-        </div>
         <div className="mt-4">
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Login
+            Register
           </button>
         </div>
       </div>
     </form>
   );
-};
-
-export default Login;
+}
