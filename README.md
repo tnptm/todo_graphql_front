@@ -38,7 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## Todo App with GraphQL — Documentation
 
 ### Overview
-A full-stack Todo application using Next.js (App Router) with Apollo Client for GraphQL and a Django backend. Supports creating, reading, updating, and deleting todos, plus filtering and optimistic UI updates.
+A full-stack Todo application using Next.js (App Router) with Apollo Client for GraphQL and a Django backend. Supports creating, reading, updating, and deleting todos, plus filtering and optimistic UI updates. Auhtentication is done with JWT tokens validating them in every call.
 
 ### Tech Stack
 - Next.js (App Router, TypeScript)
