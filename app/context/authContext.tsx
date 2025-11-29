@@ -124,9 +124,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerUser = useCallback(async (username: string, email: string, password: string) => {
     // Implement simple registration logic with GraphQL mutation
-    // This is a placeholder and should be replaced with actual registration logic
-    return { success: true  };
-  }, []);
+    setLoading(true);
+    setError(null);
+    try {
+      // 1. Register the user
+      await apolloClient.mutate({
+        mutation: REGISTER_MUTATION,
+        variables: { username, email, password },
+      });
+
+
+      // 2. If successful, log them in to get the token
+      const loginResult = await login(username, password);
+      if (!loginResult.success) {
+        throw loginResult.error || new Error("Registration successful but login failed.");
+      }
+
+      return { success: true };
+
+    } catch (err: any) {
+      setError(err);
+      setUser(null);
+      setStoredToken(null);
+      setLoading(false);
+      return { success: false, error: err };
+    }
+  }, [login]);
 
   const validateSession = useCallback(async () => {
     const token =
