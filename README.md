@@ -43,7 +43,7 @@ A full-stack Todo application using Next.js (App Router) with Apollo Client for 
 ### Tech Stack
 - Next.js (App Router, TypeScript)
 - Apollo Client (GraphQL)
-- Django backend (e.g., Django + Strawberry GraphQL or Graphene; Django REST for auth)
+- Django backend (Django +  Graphene with jwt)
 - Styling: Tailwind CSS or CSS Modules
 - State: Apollo Cache
 
